@@ -1,0 +1,34 @@
+import re
+from collections import Counter
+import matplotlib.pyplot as plt
+
+class LogAnalyzer:
+    def __init__(self, log_file):
+        self.log_file = log_file
+
+    def analyze_access_logs(self):
+        try:
+            with open(self.log_file, 'r') as f:
+                logs = f.readlines()
+                requests = [re.search(r'\"(GET|POST)\s(.+?)\sHTTP', log).group(2) for log in logs]
+                request_counts = Counter(requests)
+                self.plot_request_counts(request_counts)
+        except FileNotFoundError:
+            print("El archivo de registro no existe.")
+
+    def plot_request_counts(self, request_counts):
+        urls = list(request_counts.keys())
+        counts = list(request_counts.values())
+
+        plt.figure(figsize=(10, 6))
+        plt.bar(urls, counts)
+        plt.xlabel('URLs')
+        plt.ylabel('Número de solicitudes')
+        plt.title('Número de solicitudes por URL')
+        plt.xticks(rotation=45, ha='right')
+        plt.tight_layout()
+        plt.show()
+
+if __name__ == "__main__":
+    log_analyzer = LogAnalyzer("access.log")
+    log_analyzer.analyze_access_logs()
